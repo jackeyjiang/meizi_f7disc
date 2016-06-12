@@ -44,8 +44,8 @@ void (*pMinLimitIsr[5]) (void) = {                                          \
     min1LimitIsr, min2LimitIsr, min3LimitIsr, min4LimitIsr, min5LimitIsr};  \
 //
 //===============================================================
-void c_stepMoto::pauseTimer () {} ;//{Timer.pause (&timer2); }
-void c_stepMoto::resumeTimer() {} ;//{Timer.resume(&timer2); }
+void c_stepMoto::pauseTimer () {Timer.pause (&timer2); }
+void c_stepMoto::resumeTimer() {Timer.resume(&timer2); }
 void stepIsr ();
 //
 //===============================================================
@@ -106,11 +106,11 @@ c_stepMoto::c_stepMoto(ts_step_moto *devT) {
         //2. 限位开关
         if (dev->pinTab[i].max != -1) {
             gpio.setPinMode(dev->pinTab[i].max);
-            exti.begin(dev->pinTab[i].max, pMaxLimitIsr[i], (stepMoto.dev->pinAct[i].max) ? (EXTI_RISING) : (EXTI_FALLING));
+            //exti.begin(dev->pinTab[i].max, pMaxLimitIsr[i], (stepMoto.dev->pinAct[i].max) ? (EXTI_RISING) : (EXTI_FALLING));
         }
         if (dev->pinTab[i].min != -1) {
             gpio.setPinMode(dev->pinTab[i].min);
-            exti.begin(dev->pinTab[i].min, pMinLimitIsr[i], (stepMoto.dev->pinAct[i].min) ? (EXTI_RISING) : (EXTI_FALLING));
+            //exti.begin(dev->pinTab[i].min, pMinLimitIsr[i], (stepMoto.dev->pinAct[i].min) ? (EXTI_RISING) : (EXTI_FALLING));
         }
     }
     //
@@ -134,15 +134,15 @@ c_stepMoto::c_stepMoto(ts_step_moto *devT) {
 // 单个block 运行，在中断中执行
 //===============================================================
 void stepIsr () {
-  #if 0
+  #if 1
     static int32            axisCnt[MAX_AXIS];
     static int32            compValue;
     static float            accTime, decTime;
     static int32            stepRate;
     static int32            trigCun;
     static ts_stepBlockRun *block = NULL;
-		static uint8						pressCnt  = 0;
-		static uint8						pressWait = false;
+    static uint8                        pressCnt  = 0;
+    static uint8                        pressWait = false;
     //
     //===============================
     // 1. step 引脚复位
@@ -179,9 +179,9 @@ void stepIsr () {
             }
         }
         if (block->fanSpeed) {
-            (lcd.laserModle == true) ? (tempHotEnd2.setOut(tempHotEnd2.outMax)) : (gpio.digitalWrite(PIN_DO2, HIGH));
+            (true == true) ? (tempHotEnd2.setOut(tempHotEnd2.outMax)) : (gpio.digitalWrite(PIN_DO2, HIGH));//lcd.laserModle
         } else {
-            (lcd.laserModle == true) ? (tempHotEnd2.setOut(0)) : (gpio.digitalWrite(PIN_DO2, LOW));
+            (true == true) ? (tempHotEnd2.setOut(0)) : (gpio.digitalWrite(PIN_DO2, LOW));//lcd.laserModle
         }
         //===============================
     }
@@ -189,27 +189,27 @@ void stepIsr () {
     //===============================
     // 3. G29 Z- Detect 托盘压力检测
     if (gcode.pressDetectFlag) {
-			pressCnt++;
-			if (pressCnt > 5) {
-				pressCnt  = 0;
-				pressWait = true;
-				stepMoto.setCompare(50000);	// 等待 50ms
+            pressCnt++;
+            if (pressCnt > 5) {
+                pressCnt  = 0;
+                pressWait = true;
+                stepMoto.setCompare(50000); // 等待 50ms
                 return;
-			}
-			if (pressWait == true) {
-					uint16 max = 0, min = 0xffff, ad;
-					uint32 sum = 0;
-					for (int i=0; i<34; i++) {
-                        ad = adc.loopGetData(AUTO_LEAVER_PIN);
+            }
+            if (pressWait == true) {
+                    uint16 max = 0, min = 0xffff, ad;
+                    uint32 sum = 0;
+                    for (int i=0; i<34; i++) {
+                        //ad = adc.loopGetData(AUTO_LEAVER_PIN);
                         max  = max(max, ad);
                         min  = min(min, ad);
                         sum += ad;
-					}
-					ad = (sum - max - min)>>5;
-					if ((ad > gcode.sensitivityMax)){
-						stepMoto.dev->limitFlag = true;
-                        lcd.buzzerFlag = 1;
-					}
+                    }
+                    ad = (sum - max - min)>>5;
+                    if ((ad > gcode.sensitivityMax)){
+                        stepMoto.dev->limitFlag = true;
+                        //lcd.buzzerFlag = 1;
+                    }
             }
             pressWait = false;
     }
@@ -218,7 +218,7 @@ void stepIsr () {
     // 3. 限位开关 或者 应急停
     if (stepMoto.dev->limitFlag || gcode.emergencyStop) {
         if (stepMoto.waitMutStep) {
-            isr_sem_send(sem_step);
+            osSemaphoreRelease(sem_step);
             stepMoto.waitMutStep = false;
         }
         rb_reset(&stepMoto.rb);
@@ -231,18 +231,18 @@ void stepIsr () {
     //===============================
     // 4. 加减速
     if (trigCun < block->accelerate_until) {
-		stepRate  = accTime * block->accelerRate + block->accelerate_begin_rate;
+        stepRate  = accTime * block->accelerRate + block->accelerate_begin_rate;
         stepRate  = boundary(stepRate, block->accelerate_begin_rate, block->norminal_rate);
-        compValue = 1000000 / stepRate;						// us = 1000000us / (steps/s);
-				accTime += (float)compValue / 1000000;
+        compValue = 1000000 / stepRate;                     // us = 1000000us / (steps/s);
+                accTime += (float)compValue / 1000000;
     } else if (trigCun >= block->decelerate_after) {  
-				compValue = stepRate - block->accelerRate * decTime;
+                compValue = stepRate - block->accelerRate * decTime;
         compValue = boundary(compValue, block->decelerate_end_rate, block->norminal_rate);
         compValue = 1000000 / compValue;
-				decTime += (float)compValue / 1000000;
+                decTime += (float)compValue / 1000000;
     } else {
         stepRate = block->norminal_rate;
-				compValue = 1000000 / block->norminal_rate;
+                compValue = 1000000 / block->norminal_rate;
     }
     stepMoto.setCompare(compValue);
     //
@@ -261,7 +261,7 @@ void stepIsr () {
     // 6. 完成输出
     if (trigCun >= block->stepEventCun) {
         if (stepMoto.waitMutStep) {
-            isr_sem_send(sem_step);
+            osSemaphoreRelease(sem_step);
             stepMoto.waitMutStep = false;
         }
         rb_removeIndex(&stepMoto.rb);
@@ -347,7 +347,7 @@ void c_stepMoto::clearLimitF() {
 // 获取限制标置
 //===============================================================
 bool c_stepMoto::getMaxLimitF(bool xCheck, bool yCheck, bool zCheck) {
-  #if 0
+  #if 1
     if (xCheck && (gpio.digitalRead(dev->pinTab[X_AXIS].max) == dev->pinAct[X_AXIS].max))
         return true;
     if (yCheck && (gpio.digitalRead(dev->pinTab[Y_AXIS].max) == dev->pinAct[Y_AXIS].max))
@@ -362,7 +362,7 @@ bool c_stepMoto::getMaxLimitF(bool xCheck, bool yCheck, bool zCheck) {
 // 设比较值
 //===============================================================
 void c_stepMoto::setCompare (uint16 value) {
-  #if 0
+  #if 1
     Timer.setCompare(&STEP_TIMER, STEP_CHANNEL, Timer.getCount(&STEP_TIMER) + value);
   #endif
 }
@@ -371,7 +371,7 @@ void c_stepMoto::setCompare (uint16 value) {
 // 暂停通道中断
 //===============================================================
 void c_stepMoto::pauseInterrupt () {
-  #if 0
+  #if 1
     Timer.pauseInterrupt (&STEP_TIMER, STEP_CHANNEL);
   #endif
 }
@@ -380,7 +380,7 @@ void c_stepMoto::pauseInterrupt () {
 // 重启通道中断
 //===============================================================
 void c_stepMoto::resumeInterrupt () {
-  #if 0
+  #if 1
     Timer.resumeInterrupt (&STEP_TIMER, STEP_CHANNEL);
   #endif
 }
@@ -687,7 +687,7 @@ int32 c_stepMoto::calculateTrapezoid(ts_stepBlockRun *block, float entfactor, fl
     int32 normal_steps = block->stepEventCun - acc_steps - dec_steps;
 //---------------------------------------
 //  2. 脉冲个数不够，变化成只有加减速三角波
-	if (normal_steps < 0){
+    if (normal_steps < 0){
         acc_steps = intersection_steps(initial_rate, final_rate, block->accelerRate, block->stepEventCun);
         acc_steps = boundary(acc_steps, 0, block->stepEventCun);
         normal_steps = 0;

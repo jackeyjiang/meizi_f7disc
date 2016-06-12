@@ -3,7 +3,8 @@
 #define __STD_HARDWARESERIAL_H__
 //=============================================================
 #include "stdint.h"
-#include "stm32f7xx_hal_usart.h"
+#include "stm32f746xx.h"
+#include "stm32f7xx_hal_dma.h"
 #include "m_Print.h"
 #include "cmsis_os.h"
 #include "typeDefine.h"
@@ -15,10 +16,10 @@ typedef struct usart_dev {
 //    rcc_clk_id              clk_id;
 //    rcc_clk_id              clk_dma;
 //    IRQn                    txDmaIrq;
-//    DMA_Channel_TypeDef *   rxDma;
-//    DMA_Channel_TypeDef *   txDma;
-//    uint8                   rxPin;
-//    uint8                   txPin;
+    DMA_Stream_TypeDef *    rxDma;
+    DMA_Stream_TypeDef *    txDma;
+    uint8                   rxPin;
+    uint8                   txPin;
     char *                  rxBuf;
     char *                  txBuf;
     uint16                  rxSize;
@@ -43,7 +44,7 @@ public:
     void    txIsr();
 private:
     void    dmaTxFxn(void);
-    //usart_dev *usart_device;
+    usart_dev *usart_device;
     uint16  txHead;
     uint16  txTail;
     uint16  rxPos;

@@ -437,7 +437,7 @@ void c_commu::codeLoop(void)
             waitTimer = osKernelSysTick();
             if (stepMbxRemain==0) {
                 serialCommu.flush();
-//                 serialCommu.println("wait");
+                serialCommu.println("wait");
             }  
         }
         return;

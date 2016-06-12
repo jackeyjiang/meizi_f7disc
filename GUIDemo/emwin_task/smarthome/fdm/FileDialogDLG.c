@@ -95,6 +95,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 // USER START (Optionally insert additional static code)
 static void _cbCellEdit(WM_MESSAGE * pMsg);
+
+extern WM_HWIN CreatePrinting(void);  
 // USER END
 
 /*********************************************************************
@@ -289,7 +291,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					printf("acItemText:%s\n",acItemText);
                     GUI_EndDialog(hWin, 0);
                     CreatePrinting();
-                    melzi_start(); //3D 打印机的主程序
+                    //melzi_start(); //3D 打印机的主程序
 				}
 				//重绘窗口
 				// USER END

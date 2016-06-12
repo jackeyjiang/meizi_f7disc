@@ -35,6 +35,7 @@
 #define RTE_DEVICE_HAL_SD
 #define RTE_DEVICE_HAL_SDRAM
 #define RTE_DEVICE_HAL_UART
+#define RTE_DEVICE_HAL_USART
 #define RTE_DEVICE_STARTUP_STM32F7XX    /* Device Startup for STM32F7 */
 #define RTE_Drivers_MCI0                /* Driver MCI0 */
 #define RTE_FileSystem_Core             /* File System Core */

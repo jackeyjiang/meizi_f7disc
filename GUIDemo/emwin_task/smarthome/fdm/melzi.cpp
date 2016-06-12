@@ -360,9 +360,10 @@ int melzi_start(void) {
 //
 //--------------------------------------
 //-- EEprom 调取参数
-//     if (EEP.data.ver==0 || EEp_init_flag==0)  
-//			 eep.wirte((uint8 *)&EEP_DF, (uint32)&EEP, sizeof(para));
-//     memcopy((char *)&para, (char *)&EEP, sizeof(para));
+     if (EEP.data.ver==0 || EEp_init_flag==0)  {
+        //eep.wirte((uint8 *)&EEP_DF, (uint32)&EEP, sizeof(para));
+     }
+     memCopy((char *)&para, (char *)&EEP, sizeof(para));
 //
 //--------------------------------------
 //== 操作系统启动

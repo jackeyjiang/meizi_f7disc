@@ -32,36 +32,36 @@ inline uint32 c_gpio::gpio_read_bit(gpio_dev *dev, uint8 pin) {
 //== 写入数据 =
 //=======================================
 inline void     c_gpio::gpio_write_bit(gpio_dev *dev, uint8 pin, uint8 val) {
-    //(val != LOW) ? (dev->regs->BSRR = 1<<pin) : (dev->regs->BRR = 1<<pin);
+    (val != LOW) ? (dev->regs->BSRR = 1<<pin) : (dev->regs->BSRR = (uint32_t)pin << 16);
 }
 
 //=======================================
 //== 翻转数据 =
 //=======================================
 inline void     c_gpio::gpio_toggle_bit(gpio_dev *dev, uint8 pin) {
-    //dev->regs->ODR = dev->regs->ODR ^ (1U << pin);
+    dev->regs->ODR = dev->regs->ODR ^ (1U << pin);
 }
 
 //=======================================
 //== 根据map表操作 读
 //=======================================
 boolean c_gpio::digitalRead(uint8 pin) {
-    //return gpio_read_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit) ?
-    //    HIGH : LOW;
+    return gpio_read_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_pin) ?
+        HIGH : LOW;
 }
 
 //=======================================
 //== 根据map 表操作 写
 //=======================================
 void c_gpio::digitalWrite(uint8 pin, uint8 val) {
-    //gpio_write_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit, val);
+    gpio_write_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_pin, val);
 }
 
 //=======================================
 //== 根据map 表操作 翻转
 //=======================================
 void c_gpio::toggle(uint8 pin) {
-    //gpio_toggle_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit);
+    gpio_toggle_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_pin);
 }
 //=======================================
 //== 设定引脚
@@ -107,9 +107,8 @@ void c_gpio::setPwmDuty (uint8 pin, uint16 duty  ) {
 //=======================================
 //== 根据map 表操作 引脚模式
 //=======================================
-void c_gpio::setPinMode(uint8 pin) {
+void c_gpio::setPinMode(uint8 pin) { 
     BOOL pwm = false;
-    gpio_pin_mode    outputMode;
     GPIO_InitTypeDef gpio_init_structure;
     
     if (pin >= BOARD_NR_GPIO_PINS)

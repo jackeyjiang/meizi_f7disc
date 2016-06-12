@@ -109,7 +109,7 @@ public:
     void  initMbx ();                              // 邮箱初始化
 //---------------------------------
 //  总行程计算脉冲
-	  int32   SavePosSteps[MAX_AXIS];
+	int32   SavePosSteps[MAX_AXIS];
     int32   SaveStepEventCun;
     int32   calculateStepsGet () {return SaveStepEventCun; }
 //---------------------------------
