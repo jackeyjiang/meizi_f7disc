@@ -19,36 +19,31 @@ void c_nvic::globalDisable() {
 // 开启中断
 //===============================================
 void c_nvic::irqEnable(IRQn irq_num, uint8 mPriority, uint8 sPriority) {
-		uint32 tmpPriority = 0, tmpPre = 0, tmpSub = 0;
+	uint32 tmpPriority = 0, tmpPre = 0, tmpSub = 0;
 	
     if (irq_num < 0) {
         return;
     }
-		tmpPriority = (0x700-((SCB->AIRCR & (uint32)0x700)>>8));
-		tmpPre = 4-tmpPriority;
-		tmpSub = tmpSub>>tmpPriority;
-		tmpPriority  = mPriority<<tmpPre;
-		tmpPriority |= sPriority<<tmpSub;
-		tmpPriority = tmpPriority<<4;
-		NVIC->IP[irq_num] = tmpPriority;
-    NVIC->ISER[((uint32_t)(irq_num) >> 5)] = (1 << ((uint32_t)(irq_num) & 0x1F));
+    HAL_NVIC_SetPriority(irq_num, 0x0F, 0x00);
+    HAL_NVIC_EnableIRQ(irq_num);
 }
 
 //===============================================
 // 开启中断
 //===============================================
-void c_nvic::irqEnable(IRQn irq_num) {
+void c_nvic::irqEnable(IRQn_Type irq_num) {
     if (irq_num < 0) {
         return;
-    }
-    NVIC->ISER[((uint32_t)(irq_num) >> 5)] = (1 << ((uint32_t)(irq_num) & 0x1F));
+    }   
+    HAL_NVIC_SetPriority(irq_num, 0x0F, 0x00);
+    HAL_NVIC_EnableIRQ(irq_num);
 }
 
 //===============================================
-// 开启中断
+// 开启中断,NOUSE
 //===============================================
 void c_nvic::priorityGroup(nvic_priority_Group group) {
-	SCB->AIRCR = 0x05FA0000 | group;
+	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 }
 //
 //===============================================
@@ -58,7 +53,7 @@ void c_nvic::irqDisable(IRQn irq_num) {
     if (irq_num < 0) {
         return;
     }
-    NVIC->ICER[((uint32_t)(irq_num) >> 5)] = (1 << ((uint32_t)(irq_num) & 0x1F));
+    HAL_NVIC_DisableIRQ(irq_num);
 }
 
 c_nvic nvic;

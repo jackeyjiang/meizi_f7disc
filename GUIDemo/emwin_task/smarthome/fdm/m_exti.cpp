@@ -66,13 +66,13 @@ static  void dispatch_single_exti(uint32 exti) {
 //
 //=====================================================================
 // exit 中断函数
-void __irq_exti0(void)      {dispatch_single_exti(0);   }
-void __irq_exti1(void)      {dispatch_single_exti(1);   }
-void __irq_exti2(void)      {dispatch_single_exti(2);   }
-void __irq_exti3(void)      {dispatch_single_exti(3);   }
-void __irq_exti4(void)      {dispatch_single_exti(4);   }
-void __irq_exti9_5(void)    {dispatch_extis(5, 9);      }
-void __irq_exti15_10(void)  {dispatch_extis(10, 15);    }
+void EXTI0_IRQHandler(void)      {dispatch_single_exti(0);   }
+void EXTI1_IRQHandler(void)      {dispatch_single_exti(1);   }
+void EXTI2_IRQHandler(void)      {dispatch_single_exti(2);   }
+void EXTI3_IRQHandler(void)      {dispatch_single_exti(3);   }
+void EXTI4_IRQHandler(void)      {dispatch_single_exti(4);   }
+void EXTI9_5_IRQHandler(void)    {dispatch_extis(5, 9);      }
+void EXTI15_10_IRQHandler(void)  {dispatch_extis(10, 15);    }
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -80,55 +80,38 @@ void __irq_exti15_10(void)  {dispatch_extis(10, 15);    }
 // 开始设定引脚中断
 //=====================================================================
 void c_exti::begin(uint8 pin, voidFuncPtr handler, exti_trigger_mode mode) {
-    uint8 num = PIN_MAP[pin].gpio_pin;
-    //
-    //========================================
-    //-- 电源开启
-//    rcc.powerOn(PIN_MAP[pin].gpio_device->clk_id);
-//    rcc.powerOn(RCC_AFIO);
+    
+    if (pin >= BOARD_NR_GPIO_PINS)
+        return;
+    
+    uint8 num = PIN_MAP[pin].gpio_bit;
     //
     //========================================
     //-- 中断函数植入
     exti_channels[num].handler = handler;
     //
     //========================================
-    //-- 电平选择
-    switch (mode) {
-    case EXTI_RISING:
-        EXTI->RTSR |=  (1<<num);
-        EXTI->FTSR &= ~(1<<num);
-        break;
-    case EXTI_FALLING:
-        EXTI->FTSR |=  (1<<num);
-        EXTI->RTSR &= ~(1<<num);
-        break;
-    case EXTI_RISING_FALLING:
-        EXTI->RTSR |= (1<<num);
-        EXTI->FTSR |= (1<<num);
-        break;
-    }
+
     //
     //========================================
     //-- 中断引脚选择
-//    uint32 crT = AFIO->EXTICR[num / 4];
-//    uint16 crS = 4 * (num % 4);
-//    crT &= ~(0xF << crS);
-//    crT |=  ((PIN_MAP[pin].gpio_device->clk_id-RCC_GPIOA)<<crS);
-//    AFIO->EXTICR[num / 4] = crT;
+    
     //
     //========================================
     //-- 中断允许
-    EXTI->IMR |= (1<<num);
+   
     //
     //========================================
     //-- 中断开启
+    #if 0
     if (num < 5) {
-        nvic.irqEnable((IRQn)(EXTI0_IRQn + num));
+        nvic.irqEnable((IRQn_Type)(EXTI0_IRQn + num));
     } else if (num < 10) {
         nvic.irqEnable(EXTI9_5_IRQn);
     } else {
         nvic.irqEnable(EXTI15_10_IRQn);
     }
+    #endif
 }
 //
 //=====================================================================
@@ -138,16 +121,13 @@ void  c_exti::setMode(uint8 pin, exti_trigger_mode mode) {
     uint8 num = PIN_MAP[pin].gpio_pin;
     switch (mode) {
     case EXTI_RISING:
-        EXTI->RTSR |=  (1<<num);
-        EXTI->FTSR &= ~(1<<num);
+
         break;
     case EXTI_FALLING:
-        EXTI->FTSR |=  (1<<num);
-        EXTI->RTSR &= ~(1<<num);
+
         break;
     case EXTI_RISING_FALLING:
-        EXTI->RTSR |= (1<<num);
-        EXTI->FTSR |= (1<<num);
+
         break;
     }
 }
@@ -156,13 +136,13 @@ void  c_exti::setMode(uint8 pin, exti_trigger_mode mode) {
 // 暂停
 //=====================================================================
 void c_exti::pause (uint8 pin ) {
-    EXTI->IMR &= ~(1<<PIN_MAP[pin].gpio_pin);
+    
 }
 //=====================================================================
 // 开启
 //=====================================================================
 void c_exti::resume(uint8 pin) {
-    EXTI->IMR |=  (1<<PIN_MAP[pin].gpio_pin);
+    
 }
 //=====================================================================
 // 开始设定引脚中断
@@ -172,7 +152,7 @@ void c_exti::close(uint8 pin) {
     //
     //========================================
     //-- 中断关闭
-    EXTI->IMR &= ~(1<<num);
+    
     //========================================
     //-- 中断函数删除
     exti_channels[num].handler = NULL;

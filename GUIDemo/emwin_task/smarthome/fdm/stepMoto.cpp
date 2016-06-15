@@ -22,7 +22,6 @@ void maxLimitIsr(int Ch) {
     if (directionCnt[Ch] == 1) {
         stepMoto.dev->maxLimitFlag[Ch] = true; 
         stepMoto.dev->limitFlag = true;
-        
     }
 }
 void max1LimitIsr() {maxLimitIsr(0);}   void max2LimitIsr() {maxLimitIsr(1);}
@@ -49,33 +48,24 @@ void c_stepMoto::resumeTimer() {Timer.resume(&timer2); }
 void stepIsr ();
 //
 //===============================================================
-int8 pinTab[5][5] = {
-    {PIN_X_STEP,  PIN_X_DIR,   },
-    {PIN_Y_STEP,  PIN_Y_DIR,   },
-    {PIN_Z_STEP,  PIN_Z_DIR,   },
-    {PIN_E1_STEP, PIN_E1_DIR,  },
-    {PIN_E2_STEP, PIN_E2_DIR,  },
-};
 ts_step_moto step_moto_3d = {
     .pinTab = {         // 功能引脚表
-        {.step = pinTab[EEP.data.printer.steps_pin[0]][0],  .dir = pinTab[EEP.data.printer.steps_pin[0]][1], .enable = PIN_X_ENABLE,  .max = PIN_X_MAX,  .min = PIN_X_MIN },
-        {.step = pinTab[EEP.data.printer.steps_pin[1]][0],  .dir = pinTab[EEP.data.printer.steps_pin[1]][1], .enable = PIN_Y_ENABLE,  .max = PIN_Y_MAX,  .min = PIN_Y_MIN },
-        {.step = pinTab[EEP.data.printer.steps_pin[2]][0],  .dir = pinTab[EEP.data.printer.steps_pin[2]][1], .enable = PIN_Z_ENABLE,  .max = PIN_Z_MAX,  .min = PIN_Z_MIN },
-        {.step = pinTab[EEP.data.printer.steps_pin[3]][0],  .dir = pinTab[EEP.data.printer.steps_pin[3]][1], .enable = PIN_E1_ENABLE, .max = PIN_E1_MAX, .min = PIN_E1_MIN},
+        {.step = PIN_X_STEP,  .dir = PIN_X_DIR,  .enable = PIN_X_ENABLE,  .max = PIN_X_MAX,  .min = PIN_X_MIN },
+        {.step = PIN_Y_STEP,  .dir = PIN_Y_DIR,  .enable = PIN_Y_ENABLE,  .max = PIN_Y_MAX,  .min = PIN_Y_MIN },
+        {.step = PIN_Z_STEP,  .dir = PIN_Z_DIR,  .enable = PIN_Z_ENABLE,  .max = PIN_Z_MAX,  .min = PIN_Z_MIN },
+        {.step = PIN_E1_STEP, .dir = PIN_E1_DIR, .enable = PIN_E1_ENABLE, .max = PIN_E1_MAX, .min = PIN_E1_MIN},
         },
     .pinAct     = {     // 引脚电平有效表
         {.step = PIN_X_STEP_A,  .dir = PIN_X_DIR_P,  .enable= PIN_X_ENABLE_A,  .max = PIN_X_MAX_A,  .min= PIN_X_MIN_A },
         {.step = PIN_Y_STEP_A,  .dir = PIN_Y_DIR_P,  .enable= PIN_Y_ENABLE_A,  .max = PIN_Y_MAX_A,  .min= PIN_Y_MIN_A },
         {.step = PIN_Z_STEP_A,  .dir = PIN_Z_DIR_P,  .enable= PIN_Z_ENABLE_A,  .max = PIN_Z_MAX_A,  .min= PIN_Z_MIN_A },
         {.step = PIN_E1_STEP_A, .dir = PIN_E1_DIR_P, .enable= PIN_E1_ENABLE_A, .max = PIN_E1_MAX_A, .min= PIN_E1_MIN_A},
-//      {.step = PIN_E2_STEP_A, .dir = PIN_E2_DIR_P, .enable= PIN_E2_ENABLE_A, .max = PIN_E2_MAX_A, .min= PIN_E2_MIN_A}
         },
     .pinPara    = {     // 电机运行参数
-        {.maxSpeed = EEP.data.motion.maxSpeed[ X_AXIS], .maxAcc = EEP.data.motion.maxAcc[ X_AXIS] * EEP.data.printer.steps_mm[X_AXIS ],  .steps2mm = EEP.data.printer.steps_mm[X_AXIS ] },
-        {.maxSpeed = EEP.data.motion.maxSpeed[ Y_AXIS], .maxAcc = EEP.data.motion.maxAcc[ Y_AXIS] * EEP.data.printer.steps_mm[Y_AXIS ],  .steps2mm = EEP.data.printer.steps_mm[Y_AXIS ] },
-        {.maxSpeed = EEP.data.motion.maxSpeed[ Z_AXIS], .maxAcc = EEP.data.motion.maxAcc[ Z_AXIS] * EEP.data.printer.steps_mm[Z_AXIS ],  .steps2mm = EEP.data.printer.steps_mm[Z_AXIS ] },
-        {.maxSpeed = EEP.data.motion.maxSpeed[E1_AXIS], .maxAcc = EEP.data.motion.maxAcc[E1_AXIS] * EEP.data.printer.steps_mm[E1_AXIS],  .steps2mm = EEP.data.printer.steps_mm[E1_AXIS] },
-//      {.maxSpeed = PIN_E2_MAX_SPEED, .maxAcc = PIN_E2_MAX_ACC_SPEED* PIN_E2_STEPS_MM, .steps2mm = PIN_E2_STEPS_MM}
+        {.maxSpeed = PIN_X_MAX_SPEED,  .maxAcc = PIN_X_MAX_ACC_SPEED  * PIN_X_STEPS_MM,  .steps2mm = PIN_X_STEPS_MM  },
+        {.maxSpeed = PIN_Y_MAX_SPEED,  .maxAcc = PIN_Y_MAX_ACC_SPEED  * PIN_Y_STEPS_MM,  .steps2mm = PIN_Y_STEPS_MM  },
+        {.maxSpeed = PIN_Z_MAX_SPEED,  .maxAcc = PIN_Z_MAX_ACC_SPEED  * PIN_Z_STEPS_MM,  .steps2mm = PIN_Z_STEPS_MM  },
+        {.maxSpeed = PIN_E1_MAX_SPEED, .maxAcc = PIN_E1_MAX_ACC_SPEED * PIN_E1_STEPS_MM, .steps2mm = PIN_E1_STEPS_MM },
         },
 };
 c_stepMoto stepMoto(&step_moto_3d);
@@ -89,10 +79,17 @@ void c_stepMoto::initMbx() {
 }
 //
 //===============================================================
-// 构造函数
+// 构造函数? 在最还没进入main的时候初始化
 //=============================================================
 c_stepMoto::c_stepMoto(ts_step_moto *devT) {
   #if 1
+    
+    /* 0. 打开IO口时钟 */
+    __HAL_RCC_GPIOA_CLK_ENABLE();__HAL_RCC_GPIOB_CLK_ENABLE();__HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();__HAL_RCC_GPIOE_CLK_ENABLE();__HAL_RCC_GPIOF_CLK_ENABLE();
+    __HAL_RCC_GPIOG_CLK_ENABLE();__HAL_RCC_GPIOH_CLK_ENABLE();__HAL_RCC_GPIOI_CLK_ENABLE();
+    __HAL_RCC_GPIOJ_CLK_ENABLE();__HAL_RCC_GPIOK_CLK_ENABLE();
+    
     dev = (ts_step_moto *)devT;
     for (int i=0; i<MAX_AXIS; i++) {
         //
@@ -106,11 +103,11 @@ c_stepMoto::c_stepMoto(ts_step_moto *devT) {
         //2. 限位开关
         if (dev->pinTab[i].max != -1) {
             gpio.setPinMode(dev->pinTab[i].max);
-            //exti.begin(dev->pinTab[i].max, pMaxLimitIsr[i], (stepMoto.dev->pinAct[i].max) ? (EXTI_RISING) : (EXTI_FALLING));
+            exti.begin(dev->pinTab[i].max, pMaxLimitIsr[i], (stepMoto.dev->pinAct[i].max) ? (EXTI_RISING) : (EXTI_FALLING));
         }
         if (dev->pinTab[i].min != -1) {
             gpio.setPinMode(dev->pinTab[i].min);
-            //exti.begin(dev->pinTab[i].min, pMinLimitIsr[i], (stepMoto.dev->pinAct[i].min) ? (EXTI_RISING) : (EXTI_FALLING));
+            exti.begin(dev->pinTab[i].min, pMinLimitIsr[i], (stepMoto.dev->pinAct[i].min) ? (EXTI_RISING) : (EXTI_FALLING));
         }
     }
     //

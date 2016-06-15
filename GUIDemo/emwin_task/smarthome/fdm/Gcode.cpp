@@ -8,6 +8,7 @@ email  ：55954781@qq.com
 #include "m_include.h"
 #include "cmsis_os.h"
 #include "Gcode.h"
+#include "m_gpio.h"
 //======================================================================
 __task void gcodeTask(void const *argument) {
     gcode.calculateDeltaPara();
@@ -124,13 +125,11 @@ void c_gcode::M0_M1() {
     uint32 delayTime = osKernelSysTick();
     G4Wait = true;
     if (delayCun == 0) {
-        //while (gpio.digitalRead(LCD_ENCODENT) != LCD_ENCODENT_ACT)
-        if(0)
+        while (gpio.digitalRead(LCD_ENCODENT) != LCD_ENCODENT_ACT)
             osDelay(5);
     } else {
         while ((osKernelSysTick() - delayTime) < delayCun)  {
-            //if (gpio.digitalRead(LCD_ENCODENT) == LCD_ENCODENT_ACT)
-            if(1)
+            if (gpio.digitalRead(LCD_ENCODENT) == LCD_ENCODENT_ACT)
                 break;
             osDelay(5);
         }
@@ -144,7 +143,7 @@ void c_gcode::M0_M1() {
 void c_gcode::M17() {
     if (emergencyStop) return;
     for (int i=0; i<MAX_AXIS; i++) {
-        //gpio.digitalWrite(stepMoto.dev->pinTab[i].enable, stepMoto.dev->pinAct[i].enable);
+        gpio.digitalWrite(stepMoto.dev->pinTab[i].enable, stepMoto.dev->pinAct[i].enable);
     }
 }
 //
@@ -157,7 +156,7 @@ void c_gcode::stop() {
     emergencyStop = true;
     M25();  // sd 卡停止打印
     for (int i=0; i<MAX_AXIS; i++) {
-        //gpio.digitalWrite(stepMoto.dev->pinTab[i].enable, !stepMoto.dev->pinAct[i].enable);
+        gpio.digitalWrite(stepMoto.dev->pinTab[i].enable, !stepMoto.dev->pinAct[i].enable);
     }
     //nvic.globalEnable();
 }
@@ -178,7 +177,7 @@ void c_gcode::M220(void) {
 void c_gcode::M84(void) {
     stepMoto.waitFinish();
     for (int i=0; i<MAX_AXIS; i++) {
-        //gpio.digitalWrite(stepMoto.dev->pinTab[i].enable, (stepMoto.dev->pinAct[i].enable == HIGH) ? (LOW) : (HIGH));
+        gpio.digitalWrite(stepMoto.dev->pinTab[i].enable, (stepMoto.dev->pinAct[i].enable == HIGH) ? (LOW) : (HIGH));
     }
 }
 //
@@ -826,7 +825,7 @@ c_gcode::c_gcode() {
 //------------------------------------------
 //2. 水平调节 默认参数
     AutoLevEnable 	= true;
-		disAdjustEnable = true;
+	disAdjustEnable = true;
     
 }
 //======================================================================

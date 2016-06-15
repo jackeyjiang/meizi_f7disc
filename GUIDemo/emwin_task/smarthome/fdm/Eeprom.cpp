@@ -5,11 +5,13 @@ email  :55954781@qq.com
 ======================================================================*/
 #include "m_include.h"
 #include "Eeprom.h"
+#include "m_eep.h"
+
 //======================================================================
 // EEPROM 存放地址 出厂默认数据地址
 #define EEPROM_PAGE_SIZE		((uint16_t)0x800)
-#define EEPROM_ADDR				(0x08000000 + (uint32_t)EEPROM_PAGE_SIZE * 127) 
-#define EEPROM_DEFAULT_ADDR		(0x08000000 + (uint32_t)EEPROM_PAGE_SIZE * 126) 
+#define EEPROM_ADDR				(ADDR_FLASH_SECTOR_5)
+#define EEPROM_DEFAULT_ADDR		(ADDR_FLASH_SECTOR_5 + (uint32_t)EEPROM_PAGE_SIZE) 
 //
 //======================================================================
 // 出厂设置参数
@@ -102,7 +104,7 @@ email  :55954781@qq.com
 //======================================================================
 //
 const tu_para EEP       __attribute__ ((at(EEPROM_ADDR)));                              //2K   EEP ROM
-const ts_eeprom EEP_DF  __attribute__ ((at(EEPROM_DEFAULT_ADDR)));  //   = EEP_DEFAULT_VALUE;   EEP 出厂值
+const ts_eeprom EEP_DF  __attribute__ ((at(EEPROM_DEFAULT_ADDR))) = EEP_DEFAULT_VALUE;  // EEP 出厂值
 ts_eeprom para;    
 //     EEP 值
 //const int x1 __attribute__((at(0x10000))) = 10; /* RO */

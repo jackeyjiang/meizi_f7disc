@@ -36,6 +36,7 @@ enum {
 };
 typedef struct stm32_pin_info {
     gpio_dev        *gpio_device;       /**< Maple pin's GPIO device */
+    uint16_t        gpio_bit;           /**< Pin's GPIO port bit. */
     uint16_t        gpio_pin;           /**< Pin's GPIO port pin. */
     uint32_t        gpio_mode;          /**< Pin's GPIO port mode. */
     uint32_t        gpio_pull;          /**< Pin's GPIO port pull. */
