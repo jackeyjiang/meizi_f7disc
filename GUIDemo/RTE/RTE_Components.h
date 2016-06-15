@@ -39,6 +39,14 @@
 #define RTE_DEVICE_HAL_USART
 #define RTE_DEVICE_STARTUP_STM32F7XX    /* Device Startup for STM32F7 */
 #define RTE_Drivers_MCI0                /* Driver MCI0 */
+#define RTE_Drivers_USART1              /* Driver USART1 */
+        #define RTE_Drivers_USART2              /* Driver USART2 */
+        #define RTE_Drivers_USART3              /* Driver USART3 */
+        #define RTE_Drivers_USART4              /* Driver USART4 */
+        #define RTE_Drivers_USART5              /* Driver USART5 */
+        #define RTE_Drivers_USART6              /* Driver USART6 */
+        #define RTE_Drivers_USART7              /* Driver USART7 */
+        #define RTE_Drivers_USART8              /* Driver USART8 */
 #define RTE_FileSystem_Core             /* File System Core */
           #define RTE_FileSystem_LFN              /* File System with Long Filename support */
 #define RTE_FileSystem_Drive_MC_0       /* File System Memory Card Drive 0 */

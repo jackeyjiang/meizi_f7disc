@@ -8,8 +8,8 @@
 
 #include "sysConf.h"
      
-int melzi_start(void);
-int melzi_stop(void);
+int MELZI_Start(void);
+int MELZI_Stop(void);
 __task void initTask(void const *argument);
           
 #ifdef __cplusplus

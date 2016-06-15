@@ -196,6 +196,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         break;
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
+        BUTTON_SetDefaultSkin (BUTTON_SKIN_FLEX);
+        MELZI_Stop();
 		GUI_EndDialog(hWin, 0);
         // USER END
         break;
@@ -229,6 +231,7 @@ WM_HWIN CreateFdm(void);
 WM_HWIN CreateFdm(void) {
   WM_HWIN hWin;
   BUTTON_SetDefaultSkin(_DrawSkin_BUTTON);
+  MELZI_Start();
   hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
   return hWin;
 }

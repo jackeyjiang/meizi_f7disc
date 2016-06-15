@@ -137,7 +137,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
         break;
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
-        melzi_stop();
         GUI_EndDialog(hWin, 0);
         // USER END
         break;

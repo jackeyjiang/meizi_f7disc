@@ -318,9 +318,8 @@ __task void initTask(void const *argument) {
 //     dac.init    (testDac);
 //
 //--------------------------------------
-//  usb 标准任务，起动 setSem
-    //serialCommu.setSem();
-    //serialCommu.begin();
+//  USART6 标准任务，起动 setSem
+    serialCommu.begin();
 //
 //--------------------------------------
 //== sd 卡初始化起动
@@ -353,7 +352,7 @@ __task void initTask(void const *argument) {
 //===============================================================ADC1
 boolean EEp_init_flag = 1;
 #if 1
-int melzi_start(void) {
+int MELZI_Start(void) {
 //
 //--------------------------------------
 //-- 串口初始化  
@@ -382,7 +381,7 @@ int melzi_start(void) {
 }
 //
 //--------------------------------------
-int melzi_stop(void) {
+int MELZI_Stop(void) {
     osThreadTerminate(osThreadId_mainLoopTask);
     osThreadTerminate(osThreadId_sdReaderTask);
     osThreadTerminate(osThreadId_commuTask);

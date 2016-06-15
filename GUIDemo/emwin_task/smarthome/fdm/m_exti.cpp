@@ -91,19 +91,15 @@ void c_exti::begin(uint8 pin, voidFuncPtr handler, exti_trigger_mode mode) {
     exti_channels[num].handler = handler;
     //
     //========================================
-
-    //
-    //========================================
-    //-- 中断引脚选择
     
     //
     //========================================
-    //-- 中断允许
+    //-- 中断允许?
    
     //
     //========================================
     //-- 中断开启
-    #if 0
+    #if 1
     if (num < 5) {
         nvic.irqEnable((IRQn_Type)(EXTI0_IRQn + num));
     } else if (num < 10) {

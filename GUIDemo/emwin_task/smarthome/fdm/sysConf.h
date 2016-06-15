@@ -62,7 +62,7 @@ extern volatile uint32* __bb_addr(volatile void *address, uint32 bit, uint32 bb_
 #define SERIAL1_RX_LENGTH   100
 #define SERIAL1_TX_LENGTH   100
 
-#define SERIAL2_USE         TRUE
+#define SERIAL2_USE         FALSE
 #define SERIAL2_RX_LENGTH   100
 #define SERIAL2_TX_LENGTH   100
 //============================================================================

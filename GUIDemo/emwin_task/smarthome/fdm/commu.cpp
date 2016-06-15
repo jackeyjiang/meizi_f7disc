@@ -428,8 +428,7 @@ void c_commu::codeLoop(void)
 // 
 //----------------------------------------------------
 //1. 没有数据接收 
-    //if (osSemaphoreWait(serialCommu.semRxReady, 200)) {
-    if(1){
+    if (osSemaphoreWait(serialCommu.semRxReady, 200)) {
         if (waitingForResend>=0 || RecivingCount>0) {
             serialCommu.flush();
             requestResend();

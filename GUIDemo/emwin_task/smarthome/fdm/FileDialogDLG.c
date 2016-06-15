@@ -291,7 +291,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					printf("acItemText:%s\n",acItemText);
                     GUI_EndDialog(hWin, 0);
                     CreatePrinting();
-                    melzi_start(); //3D 打印机的主程序
 				}
 				//重绘窗口
 				// USER END
