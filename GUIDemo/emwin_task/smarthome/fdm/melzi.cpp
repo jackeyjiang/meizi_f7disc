@@ -320,6 +320,7 @@ __task void initTask(void const *argument) {
 //--------------------------------------
 //  USART6 标准任务，起动 setSem
     serialCommu.begin();
+    serialCommu.setSem();
 //
 //--------------------------------------
 //== sd 卡初始化起动
@@ -375,7 +376,7 @@ int MELZI_Start(void) {
   }
   osThreadId_initTask = osThreadCreate (osThread (initTask), NULL);
   if(osThreadId_initTask == 0){
-      printf("osThreadCreate failed\n");
+      //printf("osThreadCreate failed\n");
   }
   return 0;
 }
@@ -386,7 +387,7 @@ int MELZI_Stop(void) {
     osThreadTerminate(osThreadId_sdReaderTask);
     osThreadTerminate(osThreadId_commuTask);
     osThreadTerminate(osThreadId_gcodeTask); 
-    printf("osThreadTerminate success\n");
+    //printf("osThreadTerminate success\n");
     return 0;
 }
 

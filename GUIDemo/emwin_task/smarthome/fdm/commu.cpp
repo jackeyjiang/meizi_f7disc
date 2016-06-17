@@ -35,6 +35,9 @@ __task void commuTask(void const *argument)   {
     //================================
     //== 等待任务启动允许
     while (taskRunEnable() == false)  osDelay(1);
+    
+    serialCommu.println("commuTask init\n");
+    
     //
     //================================
     //== 任务循环

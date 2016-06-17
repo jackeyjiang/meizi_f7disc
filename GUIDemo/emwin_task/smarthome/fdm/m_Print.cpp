@@ -31,22 +31,22 @@ char * Print::itoa(int num, char *str, int radix) {
     static char string[] = "0123456789abcdefghijklmnopqrstuvwxyz";
  
     char* ptr = str;
-	  char  sig;
+    char  sig;
     int i;
     int j;
  
-		if (num<0) {
-			sig  = '-';
-			num *= -1;
-		}
-	
+    if (num<0) {
+      sig  = '-';
+      num *= -1;
+    }
+  
     while (num) {
         *ptr++ = string[num % radix];
         num /= radix;
          if (num < radix)  {
             *ptr++ = string[num];
-						if (sig == '-')
-							*ptr++ = sig;
+            if (sig == '-')
+              *ptr++ = sig;
             *ptr = '\0';
             break;
         }
@@ -68,34 +68,34 @@ char * Print::itoa(int num, char *str, int radix) {
 */
 //================================================================================
 char *Print::ftoa(float num, char *str, uint8 integer, uint8 decimal) {
-		// 默认 5.2
-		long base = 1, xx;
-		if (integer == 0) integer = 5;
-		if (decimal == 0) decimal = 2;
-		// decimal
-		for (int i=0; i<decimal; i++) {
-				num *= 10;
-		}
-		xx = num;
-		// sig
-		if (num < 0) {
-				*str++ = '-';
-				xx    *= -1;
-		}
-		//integer
-		int byte = integer + decimal;
-		for (int i=1; i<byte; i++) {
-				base *= 10;
-		}
-		//
-		for (int i=0; i<byte; i++) {
-				if (i==integer) 
-					*str++ = '.';
-				*str++ = (xx/base) % 10 + '0';
-				(base > 10) ? (base /= 10) : (base = 1);
-		}
-		*str = 0;
-		return 0;
+    // 默认 5.2
+    long base = 1, xx;
+    if (integer == 0) integer = 5;
+    if (decimal == 0) decimal = 2;
+    // decimal
+    for (int i=0; i<decimal; i++) {
+        num *= 10;
+    }
+    xx = num;
+    // sig
+    if (num < 0) {
+        *str++ = '-';
+        xx    *= -1;
+    }
+    //integer
+    int byte = integer + decimal;
+    for (int i=1; i<byte; i++) {
+        base *= 10;
+    }
+    //
+    for (int i=0; i<byte; i++) {
+        if (i==integer) 
+          *str++ = '.';
+        *str++ = (xx/base) % 10 + '0';
+        (base > 10) ? (base /= 10) : (base = 1);
+    }
+    *str = 0;
+    return 0;
 }
 //================================================================================
 /*
@@ -111,79 +111,84 @@ char *Print::ftoa(float num, char *str, uint8 integer, uint8 decimal) {
 int Print::vprintf( const char* format, ...) {
     va_list arg;
     int done = 0;
-		uint8  decimal     = 0; 		// 小数位数
-		uint8  integer     = 0;			// 整数位数
-		bool   decimalFlag = false;	// 小数位置位
-	  bool	 setType     = false;	// 整数位置位
+    uint8  decimal     = 0;     // 小数位数
+    uint8  integer     = 0;     // 整数位数
+    bool   decimalFlag = false; // 小数位置位
+    bool   setType     = false; // 整数位置位
  
     va_start (arg, format);
     //done = vfprintf (stdout, format, arg);
  
     while( *format != '\0') {
         if(*format == '%' || setType == true) {
-						char store[20];
-						char* str = store;
-						format++;
-						if (*format == '%') {
-								write('%');		
-						} else if (*format == 'c') {
-								char c = (char)va_arg(arg, int);
-								write(c);
-						} else if (*format == 'd' || *format == 'i') {
-								int i = va_arg(arg, int);
-								itoa(i, store, 10);
-								write(str);
-						} else if (*format == 'o') {
-								int i = va_arg(arg, int);
-								itoa(i, store, 8);
-								write(str);
-						} else if (*format == 'x') {
-								int i = va_arg(arg, int);
-								itoa(i, store, 16);
-								write(str);
-						} else if (*format == 's') {
-								char* str = va_arg(arg, char*);
-								write(str);
-						} else if (*format == 'f') {
-								double i = va_arg(arg, double);
-								ftoa(i, store, integer, decimal);
-								write(str);
-								setType = decimalFlag = integer = decimal = 0;
-		// 显示数据位数设定
+            char store[20];
+            char* str = store;
+            format++;
+            if (*format == '%') {
+                write('%');   
+            } else if (*format == 'c') {
+                char c = (char)va_arg(arg, int);
+                write(c);
+            } else if (*format == 'd' || *format == 'i') {
+                int i = va_arg(arg, int);
+                itoa(i, store, 10);
+                write(str);
+            } else if (*format == 'o') {
+                int i = va_arg(arg, int);
+                itoa(i, store, 8);
+                write(str);
+            } else if (*format == 'x') {
+                int i = va_arg(arg, int);
+                itoa(i, store, 16);
+                write(str);
+            } else if (*format == 's') {
+                char* str = va_arg(arg, char*);
+                write(str);
+            } else if (*format == 'f') {
+                double i = va_arg(arg, double);
+                ftoa(i, store, integer, decimal);
+                write(str);
+                setType = decimalFlag = integer = decimal = 0;
+            // 显示数据位数设定
             } else if (*format >= '0' && *format <= '9') {
-								if (decimalFlag == true) {
-									decimal = decimal * 10 + *format-'0';
-								} else {
-									integer = integer * 10 + *format-'0';
-								}
-								setType     = true;
-								continue;
-						} else if (*format == '.'){
-								setType     = true;
-								decimalFlag = true;
-								continue;
-						} else {
-								setType = decimalFlag = integer = decimal = 0;
-								continue;
-						}
+                if (decimalFlag == true) {
+                  decimal = decimal * 10 + *format-'0';
+                } else {
+                  integer = integer * 10 + *format-'0';
+                }
+                setType     = true;
+                continue;
+            } else if (*format == '.'){
+                setType     = true;
+                decimalFlag = true;
+                continue;
+            } else {
+                setType = decimalFlag = integer = decimal = 0;
+                continue;
+            }
             // Skip this one characters.
             format += 1;
         } else {
-						write(*format++);
+            write(*format++);
         }
     }
-		va_end (arg);
-		return done;
+    va_end (arg);
+    return done;
 } 
 //================================================================================
 
-
+//===============================================
+// 写字符串（str）
+//===============================================
 void Print::write(const char *str) {
     while (*str) {
         write(*str++);
     }
 }
 
+//===============================================
+// 写字符串（buffer） 长度为 size
+//===============================================
 void Print::write(const void *buffer, uint32 size) {
     uint8 *ch = (uint8*)buffer;
     while (size--) {
@@ -191,34 +196,58 @@ void Print::write(const void *buffer, uint32 size) {
     }
 }
 
+//===============================================
+// 写整数uint8（b） 进制为 base
+//===============================================
 void Print::print(uint8 b, te_base base) {
     print((uint64)b, base);
 }
 
+//===============================================
+// 写整数char（b） 进制为 base
+//===============================================
 void Print::print(char c) {
     write(c);
 }
 
+//===============================================
+// 写字符串char（str[]）
+//===============================================
 void Print::print(const char str[]) {
     write(str);
 }
 
+//===============================================
+// 写整数int（n） 进制为 base
+//===============================================
 void Print::print(int n, te_base base) {
     print((long long)n, base);
 }
 
+//===============================================
+// 写整数unsigned int（n） 进制为 base
+//===============================================
 void Print::print(unsigned int n, te_base base) {
     print((unsigned long long)n, base);
 }
 
+//===============================================
+// 写整数long（n） 进制为 base
+//===============================================
 void Print::print(long n, te_base base) {
     print((long long)n, base);
 }
 
+//===============================================
+// 写整数unsigned long（n） 进制为 base
+//===============================================
 void Print::print(unsigned long n, te_base base) {
     print((unsigned long long)n, base);
 }
 
+//===============================================
+// 输出long long 整数（n）以base 进制
+//===============================================
 void Print::print(long long n, te_base base) {
     if (base == e_BYTE) {
         write((uint8)n);
@@ -231,6 +260,9 @@ void Print::print(long long n, te_base base) {
     printNumber(n, base);
 }
 
+//===============================================
+// 输出unsignedlong long 整数（n）以base 进制 字符串显示
+//===============================================
 void Print::print(unsigned long long n, te_base base) {
     if (base == e_BYTE) {
         write((uint8)n);
@@ -239,60 +271,96 @@ void Print::print(unsigned long long n, te_base base) {
     }
 }
 
+//===============================================
+// 输出浮点（n）字符串
+//===============================================
 void Print::print(double n, int digits) {
     printFloat(n, digits);
 }
 
+//===============================================
+// 输出换行
+//===============================================
 void Print::println(void) {
     print('\r');
     print('\n');
 }
 
+//===============================================
+// 输出字符（c）输出换行
+//===============================================
 void Print::println(char c) {
     print(c);
     println();
 }
 
+//===============================================
+// 输出字符串（c）输出换行
+//===============================================
 void Print::println(const char c[]) {
     print(c);
     println();
 }
 
+//===============================================
+// 输出uint8（b）以base 进制 输出换行 
+//===============================================
 void Print::println(uint8 b, te_base base) {
     print(b, base);
     println();
 }
 
+//===============================================
+// 输出int（n）以base 进制 输出换行 
+//===============================================
 void Print::println(int n, te_base base) {
     print(n, base);
     println();
 }
 
+//===============================================
+// 输出unsigned int（n）以base 进制 输出换行 
+//===============================================
 void Print::println(unsigned int n, te_base base) {
     print(n, base);
     println();
 }
 
+//===============================================
+// 输出long（n）以base 进制 输出换行 
+//===============================================
 void Print::println(long n, te_base base) {
     print((long long)n, base);
     println();
 }
 
+//===============================================
+// 输出long（n）以base 进制 输出换行 
+//===============================================
 void Print::println(unsigned long n, te_base base) {
     print((unsigned long long)n, base);
     println();
 }
 
+//===============================================
+// 输出long long（n）以base 进制 输出换行 
+//===============================================
 void Print::println(long long n, te_base base) {
     print(n, base);
     println();
 }
 
+//===============================================
+// 输出unsigned long long（n）以base 进制 输出换行 
+//===============================================
 void Print::println(unsigned long long n, te_base base) {
     print(n, base);
     println();
 }
 
+//===============================================
+// 输出double（n）以base 进制 输出换行 
+//===============================================
 void Print::println(double n, int digits) {
     print(n, digits);
     println();
@@ -301,7 +369,9 @@ void Print::println(double n, int digits) {
 /*
  * Private methods
  */
-
+//===============================================
+// 输出unsigned long long（n）以base 进制 
+//===============================================
 void Print::printNumber(unsigned long long n, uint8 base) {
     unsigned char buf[CHAR_BIT * sizeof(long long)+1];
     unsigned long i = 0;
